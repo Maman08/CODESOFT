@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="calculator.css">
+</head>
+<body>
+  <div class="container">
+    <form>
+        <div class="row " style="justify-content: space-between; color: white; padding: 8px 8px;">
+            <div class="col-md-6" style="font-size: 23px; font-family: sans-serif; font-weight: 600;">CASIO</div>
+            <div class="col-md-6">fx-82MS</div>
+        </div>
+        <div class="row">
+            <div class="c0l-md-12" style="color: white;padding-bottom: 5px; ">S.V.P.A.M</div>
+        </div>
+        <div class="display">
+            <input type="text" name="display" id="ans" readonly>
+        </div>
+        <div class="row">
+            <input type="button" value="√" onclick="appendSpecialChar('√')" >
+            <input type="button" value="nCr" onclick="appendSpecialChar('C')" >
+            <input type="button" value="log" onclick="appendSpecialChar('log')" >
+            <input type="button" value="!" onclick="appendSpecialChar('!')" >
+
+        </div>
+        <div class="row">
+            <input type="button" value="sin" onclick="appendSpecialChar('sin')" >
+            <input type="button" value="cos" onclick="appendSpecialChar('cos')" >
+            <input type="button" value="tan" onclick="appendSpecialChar('tan')" >
+            <input type="button" value="X³" onclick="appendSpecialChar('³')" >
+
+        </div>
+
+        <div class="row">
+            <input type="button" value="X²" onclick="appendSpecialChar('²')" >
+            <input type="button" value="/" onclick="appendSpecialChar('/')" >
+            <input type="button" value="AC" class="specialcolor" onclick="clearDisplay()">
+            <input type="button" value="DE" class="specialcolor" onclick="removeLast()">
+            
+        </div>
+        <div class="row">
+            <input type="button" value="7" onclick="appendNumericChar('7')">
+            <input type="button" value="8" onclick="appendNumericChar('8')">
+            <input type="button" value="9" onclick="appendNumericChar('9')">
+            <input type="button" value="*" onclick="appendSpecialChar('*')" >
+        </div>
+        <div class="row">
+            <input type="button" value="4" onclick="appendNumericChar('4')">
+            <input type="button" value="5" onclick="appendNumericChar('5')">
+            <input type="button" value="6" onclick="appendNumericChar('6')">
+            <input type="button" value="-" onclick="appendSpecialChar('-')" c>
+        </div>
+        <div class="row">
+            <input type="button" value="1" onclick="appendNumericChar('1')">
+            <input type="button" value="2" onclick="appendNumericChar('2')">
+            <input type="button" value="3" onclick="appendNumericChar('3')">
+            <input type="button" value="+" onclick="appendSpecialChar('+')" >
+        </div>
+        <div class="row">
+            <input type="button" value="π" onclick="appendSpecialChar('π')" class="specialcolor">
+            <input type="button" value="." onclick="appendSpecialChar('.')" >
+            <input type="button" value="0" onclick="appendNumericChar('0')">
+            <input type="button" class="bigwidth" value="=" onclick="calculate()" >
+        </div>
+
+        
+
+    </form>
+  </div>
+
+  <script>
+      let ans = document.getElementById("ans");
+      let expression = "";
+
+      function clearDisplay() {
+          expression = "";
+          ans.value = "";
+          
+      }
+
+      function removeLast() {
+          expression = expression.slice(0, -1);
+          ans.value = expression;
+      }
+
+      function appendSpecialChar(value) {
+          expression += value;
+          ans.value = expression;
+      }
+
+      function appendNumericChar(value) {
+          expression += value;
+          ans.value = expression;
+      }
+
+      function calculate() {
+    ans.value = "";
+
+    if (expression.includes('!')) {
+        let newExpression = expression.replace('!', '');
+        let res = factorial(parseInt(newExpression));
+        ans.value = res;
+    } 
+    else if (expression.includes('²')) {
+        
+        let res = (parseInt(expression));
+        ans.value = res*res;
+    }
+    else if (expression.includes('³')) {
+        
+        let res = (parseInt(expression));
+        ans.value = res*res*res;
+    }
+    else if (expression.startsWith('√')) {
+        let newExpression = expression.slice(1);
+        let res = squareRoot(parseFloat(newExpression));
+        ans.value = res;
+    }
+        else if (expression.includes('C')) {
+        let parts = expression.split('C');
+        if (parts.length === 2) {
+            let n = parseInt(parts[0]);
+            let r = parseInt(parts[1]);
+            let res = NCR(n, r);
+            ans.value = res;
+        } else {
+            ans.value = "Error";
+        }
+    }
+     else if (expression.startsWith('log')) {
+        let newExpression = expression.slice(3);
+        let res = logarithm(parseFloat(newExpression));
+        ans.value = res;
+    } 
+    else if (expression.startsWith('sin') || expression.startsWith('cos') || expression.startsWith('tan')) {
+    let fun = expression.slice(0, 3);
+
+    if (expression.includes("π")) {
+        expression = expression.replace('π', '');
+    }
+
+    // Find the position of "/" or "*"
+    let endOfNumerator = expression.indexOf("/") !== -1 ? expression.indexOf("/") : expression.indexOf("*");
+
+    // Extract numerator and denominator
+    let numerator = expression.slice(3, endOfNumerator !== -1 ? endOfNumerator : undefined);
+    let denominator = endOfNumerator !== -1 ? expression.slice(endOfNumerator + 1) : undefined;
+
+    // Pass numerator and denominator to trigno function
+    if(numerator=="" || denominator==""){
+        numerator=1;
+        denominator=1;
+    }
+    let res = trigno(parseFloat(numerator*Math.PI), parseFloat(denominator), fun);
+    ans.value = res;
+}
+
+
+
+
+
+    else {
+        try {
+            let result = eval(expression);
+            if (isNaN(result) || !isFinite(result)) {
+                ans.value = "Error";
+            } else {
+                ans.value = result;
+            }
+        } catch (error) {
+            ans.value = "Error";
+        }
+    }
+}
+
+function trigno(numerator, denominator, fun) {
+    let result;
+    console.log(numerator,denominator);
+
+    if (fun === 'sin') {
+        result = Math.sin(numerator / denominator);
+    } else if (fun === 'cos') {
+        result = Math.cos(numerator / denominator);
+    } else if (fun === 'tan') {
+        result = Math.tan(numerator / denominator);
+    } else {
+        result = NaN; // Invalid trigonometric function
+    }
+
+    return result;
+}
+
+
+
+
+
+
+function factorial(n) {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+function NCR(n, r) {
+    return factorial(n) / (factorial(r) * factorial(n - r));
+}
+
+function logarithm(value) {
+    return Math.log10(value);
+}
+function squareRoot(value) {
+    return Math.sqrt(value);
+}
+
+
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
